@@ -61,6 +61,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # For third-party modules
+    'rest_framework',
 ]
 
 INSTALLED_APPS += LOCAL_APP_DIRS
@@ -225,3 +228,8 @@ for dir_name in LOCAL_APP_DIRS:
         'level': 'DEBUG',
         'propagate': True
     }
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10,
+}

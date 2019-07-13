@@ -15,10 +15,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.conf import settings
-from django.urls import include, path  # For django versions from 2.0 and up
+from django.urls import include, path
+
+from lupa.routes import api_router
+
 
 urlpatterns = [
+    path('api/', include(api_router.urls)),
     path('admin/', admin.site.urls),
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 ]
 
 if settings.DEBUG:
