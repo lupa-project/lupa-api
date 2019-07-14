@@ -11,3 +11,5 @@ asn1crypto==0.24.0
 cffi==1.12.3
 cryptography==2.7
 pycparser==2.19
+PyJWT==1.7.1
+djangorestframework-jwt==1.11.0
