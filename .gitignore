@@ -82,3 +82,4 @@ celerybeat-schedule
 # Redis dump file
 *.rdb
 *.pid
+.envrc
