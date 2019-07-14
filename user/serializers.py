@@ -3,8 +3,15 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 
 
-# Serializers define the API representation.
 class UserSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(read_only=True)
+    password = serializers.CharField(write_only=True)
+    is_active = serializers.BooleanField(read_only=True)
+    is_staff = serializers.BooleanField(read_only=True)
+    is_superuser = serializers.BooleanField(read_only=True)
+    date_joined = serializers.DateTimeField(read_only=True)
+    last_login = serializers.DateTimeField(read_only=True)
+
     class Meta:
         model = User
         fields = (
@@ -16,19 +23,6 @@ class UserSerializer(serializers.ModelSerializer):
             'is_superuser',
             'date_joined',
             'last_login',
-        )
-
-
-class UserListSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(read_only=True)
-    password = serializers.CharField(write_only=True)
-
-    class Meta:
-        model = User
-        fields = (
-            'id',
-            'username',
-            'password',
         )
 
     def create(self, validated_data):
