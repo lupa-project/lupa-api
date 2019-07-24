@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
+from datetime import timedelta
 
 import pymysql
 from django.core.exceptions import ImproperlyConfigured
@@ -230,6 +231,22 @@ for dir_name in LOCAL_APP_DIRS:
     }
 
 REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
+}
+
+JWT_AUTH = {
+    'JWT_ALGORITHM': 'HS256',
+    'JWT_EXPIRATION_DELTA': timedelta(seconds=300),
+    'JWT_ALLOW_REFRESH': True,
+    'JWT_REFRESH_EXPIRATION_DELTA': timedelta(days=7),
+    'JWT_AUTH_HEADER_PREFIX': 'JWT',
 }
