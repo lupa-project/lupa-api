@@ -29,7 +29,7 @@ from rest_framework_jwt.views import (
 
 
 urlpatterns = [
-    path('api/', include(api_router.urls)),
+    path('api/', include('lupa.routes')),
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('api-token-auth/', obtain_jwt_token),

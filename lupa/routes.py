@@ -1,4 +1,11 @@
-from rest_framework import routers
+from django.urls import (
+    include,
+    path,
+)
 
-# router.register(r'sample', views.SampleViewSet)
-api_router = routers.DefaultRouter()
+from user.routes import user_router
+
+
+urlpatterns = [
+    path('user/', include(user_router.urls)),
+]
