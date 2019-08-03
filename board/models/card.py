@@ -20,8 +20,8 @@ class Card(models.Model):
         # `to` 필드는 관계의 대상이 되는 모델을 지정해줍니다.
         to=User,
         # `on_delete` 옵션은 이 필드와 관계를 가지는 모델(여기서는 User)의 row 가 DB 상에서 삭제될 때,
-        # 그 row 의 primary key 를 가지는 타 모델(여기서는 Card)의 row 를 어떻게 처리할지에 대한 정의입니다.
-        # `CASCADE` 는 Board 를 User 에 종속적인 관계로 정의합니다. 즉, User 가 삭제되면 Card 도 따라 삭제됩니다.
+        # 그 row 의 primary key 를 foreign key 로 가지는 타 모델(여기서는 Card)의 row 를 어떻게 처리할지에 대한 정의입니다.
+        # `CASCADE` 는 Board 를 User 에 종속적인 관계로 정의합니다. 즉, User 가 삭제되면 그에 해당하는 Card 도 따라 삭제됩니다.
         # 그 외에 `DO_NOTHING`, `SET_DEFAULT`, `SET_NULL` 등의 옵션이 있습니다. 필요에 따라 찾아보시면 될 것 같습니다.
         on_delete=models.CASCADE,
         # `related_name` 옵션은 관계의 대상이 되는 모델(여기서는 User)에서 이 모델(여기서는 Card)로 접근할 때 사용할 키워드를 정의합니다.
@@ -33,7 +33,7 @@ class Card(models.Model):
         verbose_name='작성자',
     )
 
-    # 아직 BankHistory(입출금내역) 모델이 만들어지지 않아, 주석처리합니다.
+    # TODO: 아직 BankHistory(입출금내역) 모델이 만들어지지 않아, ForeignKey 를 걸 수 없으므로 주석처리합니다.
     """
     bank_history = models.ForeignKey(
         to=BankHistory,
@@ -75,10 +75,11 @@ class Card(models.Model):
     )
 
     def __str__(self):
+        # 만약 스트링 형태로 casting 시 어떤 형태로 보여줄지 정의합니다. (주로 django shell 을 이용한 command 처리시 보여집니다.)
         return 'Card(ID {}, by {}, at {})'.format(self.id, self.user, self.created_datetime)
 
     class Meta:
         # DB 상에서 사용할 테이블의 이름입니다.
         db_table = 'card'
         verbose_name = '카드'
-        verbose_name_plural = '{} 목록'.format(verbose_name)
+        verbose_name_plural = '{} {}'.format(verbose_name, '목록')
