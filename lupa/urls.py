@@ -20,7 +20,6 @@ from django.urls import (
     path,
 )
 
-from lupa.routes import api_router
 from rest_framework_jwt.views import (
     obtain_jwt_token,
     refresh_jwt_token,
