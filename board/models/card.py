@@ -26,11 +26,14 @@ class Card(models.Model):
         on_delete=models.CASCADE,
         # `related_name` 옵션은 관계의 대상이 되는 모델(여기서는 User)에서 이 모델(여기서는 Card)로 접근할 때 사용할 키워드를 정의합니다.
         # 여기서 지정된 키워드는 관계의 대상이 되는 모델(여기서는 User)의 인스턴스에서 Manager 를 사용하듯 접근할 수 있습니다.
+        # 역참조 쿼리 시 사실상 필드 이름과 동일하게 사용되기 때문에 네이밍에 신중해야 합니다. 반드시 복수형으로 정의해주세요.
         # 특정 User 인스턴스가 가지고 있는 Card 를 모두 가져오고 싶다면 `user.cards.all()` 로 접근할 수 있습니다.
         related_name='cards',
         # `verbose_name` 은 이 필드의 readable 한 명칭을 정의합니다.
         # 여기서 정의된 필드 명칭은 후에 ModelForm, ModelAdmin 을 다룰 때 장고에서 사용하게 됩니다. (필드 라벨을 자동으로 만들어준다거나 등...)
         verbose_name='작성자',
+        # 그 외에도 여러가지 가능한 옵션이 있습니다.
+        # https://docs.djangoproject.com/en/2.1/ref/models/fields/#module-django.db.models.fields 를 참조해주세요.
     )
 
     # TODO: 아직 BankHistory(입출금내역) 모델이 만들어지지 않아, ForeignKey 를 걸 수 없으므로 주석처리합니다.
