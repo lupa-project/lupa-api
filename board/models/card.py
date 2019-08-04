@@ -3,8 +3,10 @@ from django.db import models
 # LUPA 에서 Root 격 되는 유저 모델은 이것을 사용할 생각입니다.
 from django.contrib.auth.models import User
 
+from utils.models import TimestampedModel
 
-class Card(models.Model):
+
+class Card(TimestampedModel):
     # ForeignKey 는 타 모델과의 관계를 정의하는 필드입니다.
     # 아래와 같이 정의한 경우, User 가 여러 Board 를 가지는 1:N 관계가 성립됩니다.
     # 이렇게 만들어진 필드는 DB 상에서는 <필드이름>_id (아래의 경우 `user_id`) 로 생성되며,
@@ -63,18 +65,6 @@ class Card(models.Model):
     content = models.TextField(
         verbose_name='내용',
         help_text='마크다운 에디터로 작성되어 마크다운 포맷으로 저장됩니다.',
-    )
-
-    created_datetime = models.DateTimeField(
-        verbose_name='생성일시',
-        # `auto_now_add` 옵션이 있을 경우, 모델 인스턴스가 처음으로 DB 에 생성될 때 장고에서 이 필드를 그 일시로 채워줍니다.
-        auto_now_add=True,
-    )
-
-    updated_datetime = models.DateTimeField(
-        verbose_name='수정일시',
-        # `auto_now` 옵션이 있을 경우, 각각의 모델 인스턴스가 save 될 때마다 장고에서 이 필드를 그 일시로 업데이트 해줍니다.
-        auto_now=True,
     )
 
     def __str__(self):
