@@ -79,7 +79,7 @@ class Card(models.Model):
 
     def __str__(self):
         # 만약 스트링 형태로 casting 시 어떤 형태로 보여줄지 정의합니다. (주로 django shell 을 이용한 command 처리시 보여집니다.)
-        return 'Card(ID {}, by {}, at {})'.format(self.id, self.user, self.created_datetime)
+        return f'Card(ID {self.id}, by {self.user}, at {self.created_datetime})'
 
     class Meta:
         # DB 상에서 사용할 테이블의 이름입니다.
