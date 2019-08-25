@@ -15,6 +15,14 @@ class BankUser(models.Model):
                                      null=False, blank=False, help_text="은행 Api 사용자 인증용 토큰을 갱신하기 위한 token")
     scope = models.CharField(verbose_name="오픈플랫폼고객실명", max_length=25,
                              null=False, blank=False, help_text="은행 Api 에서 주는 유저 연결 정보")
-    expire_time = models.IntegerField(verbose_name="토큰만료시간")
+    expire_time = models.DateTimeField(verbose_name="토큰만료시간")
     create_time = models.DateTimeField(auto_now_add=True)
     update_time = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return 'id: {}'.format(self.id)
+
+    class Meta:
+        db_table = 'bank_user'
+        verbose_name = '은행 유저 정보'
+        verbose_name_plural = verbose_name
