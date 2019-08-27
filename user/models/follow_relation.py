@@ -4,7 +4,7 @@ from utils.models import TimestampedModel
 from django.contrib.auth.models import User
 
 
-class UserAccount(TimestampedModel):
+class UserFollowInfo(TimestampedModel):
     user = models.OneToOneField(
         # User 테이블을 구조적으로 확장
         User,
@@ -12,7 +12,7 @@ class UserAccount(TimestampedModel):
     )
 
     follows = models.ManyToManyField(
-        # UserAccount 자기 자신의 모델과 N:N 관계
+        # UserFollowInfo 자기 자신의 모델과 N:N 관계
         'self',
         # 비대칭 관계
         symmetrical=False,
@@ -24,18 +24,72 @@ class UserAccount(TimestampedModel):
         return self.user.username
 
     def follow(self, to_user):
-        return
+        # Follow Relation 을 생성
 
-    def unfollow(self, to_user):
-        return
+        # get_or_create : 객체를 조회할 때 사용하는 메소드로 (object, created) 라는 튜플 형식으로 반환
+        # 첫 번째 인자는 모델의 인스턴스, 두 번째 인자는 boolean flag
+        # 두 번째 인자가 True 라면 인스턴스가 get_or_created 메서드에 의해 생성되었음, False 라면 인스턴스를 데이터베이스에서 꺼내왔음을 의미
+        follow_info, created = FollowRelation.objects.get_or_create(
+            follower=self,
+            following=to_user,
+        )
+        follow_info.save()
+
+        return created
+
+    def unfollow(self, from_user):
+        # Follow Relation 을 삭제
+        follow_info, created = FollowRelation.objects.get_or_create(
+            follower=from_user,
+            following=self,
+        )
+        if not created and follow_info.APPROVED:
+            follow_info.delete()
+            return not created
+
+        return created
+
+    def approve(self, from_user):
+        # Unapproved 일 경우 승인
+        follow_info, created = FollowRelation.objects.get_or_create(
+            follower=from_user,
+            following=self,
+            type=FollowRelation.UNAPPROVED
+        )
+        if not created and follow_info.UNAPPROVED:
+            follow_info.is_approved = FollowRelation.APPROVED
+            follow_info.save()
+            return not created
+
+        return created
+
+    def reject(self, from_user):
+        # Unapproved 일 경우 거부
+        follow_info, created = FollowRelation.objects.get_or_create(
+            follower=from_user,
+            following=self,
+            type=FollowRelation.UNAPPROVED
+        )
+        if not created and follow_info.UNAPPROVED:
+            follow_info.is_approved = FollowRelation.REJECTED
+            follow_info.save()
+            return not created
+
+        return created
 
     def get_following(self):
-        # 내가 follow 하고 있는 UserAccount 목록 가져오기
-        return
+        # 내가 follow 하고 있는 UserFollowInfo 목록 가져오기
+        following_relation = self.followings.filter(type=FollowRelation.APPROVED)
+        # values 는 해당 쿼리셋에서 각각을 키/값 딕셔너리로 바꾸어 반환
+        # values_list 는 딕셔너리가 아닌 리스트 형태로 값들을 튜플로 만들어 리스트에 담아 반환
+        following_list = following_relation.values_list('followings', flat=True)
+        return FollowRelation.objects.filter(pk__in=following_list)
 
     def get_followers(self):
-        # 나를 follow 하고 있는 UserAccount 목록 가져오기
-        return
+        # 나를 follow 하고 있는 UserFollowInfo 목록 가져오기
+        follower_relation = self.followers.filter(type=FollowRelation.APPROVED)
+        follower_list = follower_relation.values_list('followers', flat=True)
+        return FollowRelation.objects.filter(pk__in=follower_list)
 
     class Meta:
         db_table = 'user_account'
@@ -49,22 +103,38 @@ class FollowRelation(TimestampedModel):
     # - User 모델은 `django.contrib.auth.models.User` 를 사용하시면 됩니다.
     # - 만들어지는 모델은 다음과 같은 표현이 가능해야합니다.
     #     - `UserA 는 UserB 를 팔로우하였으며, 아직 승인되지 않았다 / 승인되었다`
+    APPROVED = 'A'
+    UNAPPROVED = 'U'
+    REJECTED = 'R'
+    CHOICES_TYPE = (
+        (APPROVED, 'approved'),
+        (UNAPPROVED, 'unapproved'),
+        (REJECTED, 'rejected'),
+    )
+
+    # 같은 모델에 대해 ForeignKey 를 두 개 쓰고 있어서
+    # 역참조 시에 어떤 모델을 참조해야 하는지 불분명해지므로 related_name 을 지정
     follower = models.ForeignKey(
-        UserAccount,
+        UserFollowInfo,
         on_delete=models.CASCADE,
         related_name='followers'
     )
     following = models.ForeignKey(
-        UserAccount,
+        UserFollowInfo,
         on_delete=models.CASCADE,
         related_name='followings'
     )
 
+    # 승인됨/승인되지 않음을 표현하는 DB 상 필드
+    is_approved = models.CharField(
+        max_length=1,
+        default=UNAPPROVED,
+        choices=CHOICES_TYPE,
+        related_name='is_approved'
+    )
+
     def __str__(self):
         return f'{self.follower.user.username} -> {self.following.user.username}'
-
-    def approval(self, to_user):
-        return
 
     class Meta:
         db_table = 'follow_relation'
