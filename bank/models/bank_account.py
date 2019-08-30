@@ -28,8 +28,16 @@ class BankAccount(models.Model):
     inquiry_agree_datetime = models.DateTimeField(verbose_name="조회서비스동의날짜", null=True, blank=True)
 
     transfer_agreement = models.CharField(verbose_name="오픈플랫폼고객실명", max_length=25,
-                                          null=False, blank=False, help_text="은행 Api 에서 주는 유저 연결 정보")
+                                          null=True, blank=False, help_text="은행 Api 에서 주는 유저 연결 정보")
     transfer_agree_datetime = models.DateTimeField(verbose_name="출금서비스동의날짜", null=True, blank=True)
 
     create_time = models.DateTimeField(auto_now_add=True)
     update_time = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return 'id: {}'.format(self.id)
+
+    class Meta:
+        db_table = 'bank_account'
+        verbose_name = '은행 유저 정보'
+        verbose_name_plural = verbose_name
