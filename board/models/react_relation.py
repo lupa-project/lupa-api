@@ -12,23 +12,21 @@ class Profile(TimestampedModel):
         Symmetrical=False
     )
 
-    def reaction(self, card):
-
-        reactions, created = ReactRelation.objects.get_or_create(
+    def reaction_change(self, card):
+        reactions, is_reactions = ReactRelation.objects.get_or_create(
             profile=self,
             card=card
         )
-        reactions.save()
-        return created
+        if not is_reactions:
+            reactions.delete()
+        else:
+            return reactions
 
+    def like_counts(self):
+        return ReactRelation.objects.filter(reaction_choice=1).count()
 
-    def unreaction(self, card):
-        reactions, created = ReactRelation.objects.get_or_create(
-            profile=self,
-            card=card
-        )
-        reactions.delete()
-        return not created
+    def dislike_counts(self):
+        return ReactRelation.objects.filter(reaction_choice=2).count()
 
     def __str__(self):
         return self.user.username
@@ -38,12 +36,10 @@ class Profile(TimestampedModel):
         verbose_name = 'Profile_relation'
         verbose_name_plural = '{} {}'.format(verbose_name, '목록')
 
-
-
 LIKE = 1
 DISLIKE = 2
 
-react_Choice = (
+choice = (
     (LIKE, 'like'),
     (DISLIKE, 'dislike'),
 )
@@ -59,10 +55,9 @@ class ReactRelation(TimestampedModel):
                              related_name='react_profiles'
                                 )
 
-
-    reaction_counts = models.IntegerField(
-        verbose_name="reaction_counts",
-        choices=react_Choice
+    reaction_choice = models.IntegerField(
+        verbose_name="reaction_choice",
+        choices=choice
     )
 
     def __str__(self):
