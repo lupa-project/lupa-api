@@ -75,4 +75,4 @@ class Card(TimestampedModel):
         # DB 상에서 사용할 테이블의 이름입니다.
         db_table = 'card'
         verbose_name = '카드'
-        verbose_name_plural = '{} {}'.format(verbose_name, '목록')
+        verbose_name_plural = f'{verbose_name} 목록'
