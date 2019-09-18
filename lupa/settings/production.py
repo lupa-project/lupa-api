@@ -120,7 +120,9 @@ DATABASES = {
     }
 }
 
-
+OPEN_PLATFORM_URL = get_env_variable('OPEN_PLATFORM_URL')
+OPEN_PLATFORM_API_KEY = get_env_variable('OPEN_PLATFORM_API_KEY')
+OPEN_PLATFORM_API_SECRET = get_env_variable('OPEN_PLATFORM_API_SECRET')
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
 
