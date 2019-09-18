@@ -2,9 +2,14 @@ from django.db import models
 from django.contrib.auth.models import User
 from board.models.card import Card
 from utils.models import TimestampedModel
+from model_utils import Choices
+
+
+
 
 class Profile(TimestampedModel):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+
     react = models.ManyToManyField(
         Card,
         through='ReactRelation',
@@ -23,10 +28,10 @@ class Profile(TimestampedModel):
             return reactions
 
     def like_counts(self):
-        return ReactRelation.objects.filter(reaction_choice=1).count()
+        return ReactRelation.objects.filter(reaction_choice='like').count()
 
     def dislike_counts(self):
-        return ReactRelation.objects.filter(reaction_choice=2).count()
+        return ReactRelation.objects.filter(reaction_choice='dislike').count()
 
     def __str__(self):
         return self.user.username
@@ -36,26 +41,24 @@ class Profile(TimestampedModel):
         verbose_name = 'Profile_relation'
         verbose_name_plural = '{} {}'.format(verbose_name, '목록')
 
-LIKE = 1
-DISLIKE = 2
-
-choice = (
-    (LIKE, 'like'),
-    (DISLIKE, 'dislike'),
+choice = Choices(
+    ('like'),
+    ('dislike')
 )
 class ReactRelation(TimestampedModel):
-
-
     card = models.ForeignKey(Card,
                              on_delete=models.CASCADE,
                              related_name='react_relations'
                              )
+
+
+
     profile = models.ForeignKey(Profile,
                              on_delete=models.CASCADE,
                              related_name='react_profiles'
                                 )
 
-    reaction_choice = models.IntegerField(
+    reaction_choice = models.CharField(
         verbose_name="reaction_choice",
         choices=choice
     )
