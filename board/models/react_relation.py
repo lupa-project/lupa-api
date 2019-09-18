@@ -38,12 +38,12 @@ class Profile(TimestampedModel):
 
     class Meta:
         db_table = 'profile_relation'
-        verbose_name = 'Profile_relation'
+        verbose_name = 'profile_relation'
         verbose_name_plural = '{} {}'.format(verbose_name, '목록')
 
 choice = Choices(
-    ('like'),
-    ('dislike')
+    'like',
+    'dislike'
 )
 class ReactRelation(TimestampedModel):
     card = models.ForeignKey(Card,
@@ -69,7 +69,7 @@ class ReactRelation(TimestampedModel):
 
     class Meta:
         db_table = 'card_relation'
-        verbose_name = 'Card_relation'
+        verbose_name = 'card_relation'
         verbose_name_plural = '{} {}'.format(verbose_name, '목록')
 
     # - 이 친구는 사용자가 카드에 대한 반응 Relation 모델입니다
