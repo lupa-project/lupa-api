@@ -29,10 +29,10 @@ class UserFollowInfo(TimestampedModel):
         Create and Returns follow_info object
 
         Args:
-            to_user (An instance of UserFollowInfo):
+            to_user (UserFollowInfo)
 
         Returns:
-            An instance of FollowRelation or None
+            FollowRelation or None
         """
         # Follow Relation 을 생성
 
@@ -55,7 +55,7 @@ class UserFollowInfo(TimestampedModel):
         Delete follow_info object
 
         Args:
-            from_user (An instance of UserFollowInfo):
+            from_user (UserFollowInfo)
 
         Returns:
             bool: True if successful, False otherwise.
@@ -78,7 +78,7 @@ class UserFollowInfo(TimestampedModel):
         Change the value 'UNAPPROVED' to 'APPROVED'
 
         Args:
-            from_user (An instance of UserFollowInfo):
+            from_user (UserFollowInfo)
 
         Returns:
             bool: True if successful, False otherwise.
@@ -101,7 +101,7 @@ class UserFollowInfo(TimestampedModel):
         Change the value 'UNAPPROVED' to 'REJECTED'
 
         Args:
-            from_user (An instance of UserFollowInfo):
+            from_user (UserFollowInfo)
 
         Returns:
             bool: True if successful, False otherwise.
