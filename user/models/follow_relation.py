@@ -183,7 +183,6 @@ class FollowRelation(TimestampedModel):
         max_length=1,
         default='UNAPPROVED',
         choices=CHOICES_TYPE,
-        related_name='is_approved'
     )
 
     def __str__(self):
