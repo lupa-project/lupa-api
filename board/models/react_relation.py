@@ -13,7 +13,7 @@ class Profile(TimestampedModel):
     react = models.ManyToManyField(
         Card,
         through='ReactRelation',
-        related_name='react',
+        related_name='react_relation',
         Symmetrical=False
     )
 
@@ -55,7 +55,7 @@ class ReactRelation(TimestampedModel):
 
     profile = models.ForeignKey(Profile,
                              on_delete=models.CASCADE,
-                             related_name='react_profiles'
+                             related_name='react_relations'
                                 )
 
     reaction_choice = models.CharField(
