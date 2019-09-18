@@ -13,8 +13,8 @@ from bank.models import (
 import datetime
 
 
-@permission_classes(AllowAny)
 class CreateBankUserCallBack(APIView):
+    permission_classes = [AllowAny]
 
     def validate_data(self, authorization_code, scope):
         return not (
@@ -30,6 +30,7 @@ class CreateBankUserCallBack(APIView):
         if self.validate_data(authorization_code=authorization_code, scope=scope):
             # TODO logger setting 이후 error logging 필요함
             raise ValueError
+
         res = get_token(code=authorization_code)
         access_token = res['access_token']
         token_type = res['token_type']

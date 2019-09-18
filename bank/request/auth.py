@@ -1,5 +1,6 @@
 import requests
 from django.conf import settings
+import json
 
 GET_TOKEN_ENDPOINT = '/oauth/2.0/token'
 GET_USER_INFO_ENDPOINT = '/user/me'
@@ -8,13 +9,14 @@ GET_USER_INFO_ENDPOINT = '/user/me'
 def get_token(code):
     url = settings.OPEN_PLATFORM_URL + GET_TOKEN_ENDPOINT
     data = {
-        "code": code,
-        "client_id": settings.OPEN_PLATFORM_API_KEY,
-        "client_secret": settings.OPEN_PLATFORM_API_SECRET,
-        # TODO urls 에서 받아오는걸로 교체가 좋을듯. 일단 테스트를 위해 localhost
-        "redirect_uri": "http://localhost:8000/bank/create_bank_user",
-        "grant_type": "authorization_code"
-    }
+            "code": code,
+            "client_id": settings.OPEN_PLATFORM_API_KEY,
+            "client_secret": settings.OPEN_PLATFORM_API_SECRET,
+            # TODO urls 에서 받아오는걸로 교체가 좋을듯. 일단 테스트를 위해 localhost
+            "redirect_uri": "http://localhost:8000/bank/create_bank_user",
+            "grant_type": "authorization_code"
+        }
+    # )
     headers = {
       'Content-Type': 'application/x-www-form-urlencoded'
     }
