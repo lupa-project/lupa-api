@@ -1,5 +1,6 @@
 from django.db import models
 
+from model_utils import Choices
 from utils.models import TimestampedModel
 from django.contrib.auth.models import User
 
@@ -24,6 +25,15 @@ class UserFollowInfo(TimestampedModel):
         return self.user.username
 
     def follow(self, to_user):
+        """
+        Create and Returns follow_info object
+
+        Args:
+            to_user (An instance of UserFollowInfo):
+
+        Returns:
+            An instance of FollowRelation or None
+        """
         # Follow Relation 을 생성
 
         # get_or_create : 객체를 조회할 때 사용하는 메소드로 (object, created) 라는 튜플 형식으로 반환
@@ -32,52 +42,91 @@ class UserFollowInfo(TimestampedModel):
         follow_info, created = FollowRelation.objects.get_or_create(
             follower=self,
             following=to_user,
+            type=FollowRelation.UNAPPROVED,
         )
-        follow_info.save()
 
-        return created
+        if created:
+            return follow_info
+        else:
+            return None
 
     def unfollow(self, from_user):
-        # Follow Relation 을 삭제
-        follow_info, created = FollowRelation.objects.get_or_create(
-            follower=from_user,
-            following=self,
-        )
-        if not created and follow_info.APPROVED:
-            follow_info.delete()
-            return not created
+        """
+        Delete follow_info object
 
-        return created
+        Args:
+            from_user (An instance of UserFollowInfo):
+
+        Returns:
+            bool: True if successful, False otherwise.
+
+        """
+        # Follow Relation 을 삭제
+        try:
+            follow_info = FollowRelation.objects.get(
+                follower=from_user,
+                following=self,
+                type=FollowRelation.APPROVED,
+            )
+            follow_info.delete()
+            return True
+        except follow_info.DoesNotExist:
+            return False
 
     def approve(self, from_user):
-        # Unapproved 일 경우 승인
-        follow_info, created = FollowRelation.objects.get_or_create(
-            follower=from_user,
-            following=self,
-            type=FollowRelation.UNAPPROVED
-        )
-        if not created and follow_info.UNAPPROVED:
+        """
+        Change the value 'UNAPPROVED' to 'APPROVED'
+
+        Args:
+            from_user (An instance of UserFollowInfo):
+
+        Returns:
+            bool: True if successful, False otherwise.
+
+        """
+        try:
+            follow_info = FollowRelation.objects.get(
+                follower=from_user,
+                following=self,
+                type=FollowRelation.UNAPPROVED,
+            )
             follow_info.is_approved = FollowRelation.APPROVED
             follow_info.save()
-            return not created
-
-        return created
+            return True
+        except follow_info.DoesNotExist:
+            return False
 
     def reject(self, from_user):
-        # Unapproved 일 경우 거부
-        follow_info, created = FollowRelation.objects.get_or_create(
-            follower=from_user,
-            following=self,
-            type=FollowRelation.UNAPPROVED
-        )
-        if not created and follow_info.UNAPPROVED:
+        """
+        Change the value 'UNAPPROVED' to 'REJECTED'
+
+        Args:
+            from_user (An instance of UserFollowInfo):
+
+        Returns:
+            bool: True if successful, False otherwise.
+
+        """
+        try:
+            follow_info, created = FollowRelation.objects.get(
+                follower=from_user,
+                following=self,
+                type=FollowRelation.UNAPPROVED,
+            )
             follow_info.is_approved = FollowRelation.REJECTED
             follow_info.save()
-            return not created
-
-        return created
+            return True
+        except follow_info.DoesNotExist:
+            return False
 
     def get_following(self):
+        """
+        Returns the list of users that 'self' is following
+
+        Returns:
+            list: following
+
+        """
         # 내가 follow 하고 있는 UserFollowInfo 목록 가져오기
         following_relation = self.followings.filter(type=FollowRelation.APPROVED)
         # values 는 해당 쿼리셋에서 각각을 키/값 딕셔너리로 바꾸어 반환
@@ -86,6 +135,13 @@ class UserFollowInfo(TimestampedModel):
         return FollowRelation.objects.filter(pk__in=following_list)
 
     def get_followers(self):
+        """
+        Returns the list of users following 'self'
+
+        Returns:
+            list: followers
+
+        """
         # 나를 follow 하고 있는 UserFollowInfo 목록 가져오기
         follower_relation = self.followers.filter(type=FollowRelation.APPROVED)
         follower_list = follower_relation.values_list('followers', flat=True)
@@ -94,7 +150,7 @@ class UserFollowInfo(TimestampedModel):
     class Meta:
         db_table = 'user_account'
         verbose_name = 'User Account'
-        verbose_name_plural = '{} {}'.format(verbose_name, '목록')
+        verbose_name_plural = f'{verbose_name} 목록'
 
 
 class FollowRelation(TimestampedModel):
@@ -103,13 +159,10 @@ class FollowRelation(TimestampedModel):
     # - User 모델은 `django.contrib.auth.models.User` 를 사용하시면 됩니다.
     # - 만들어지는 모델은 다음과 같은 표현이 가능해야합니다.
     #     - `UserA 는 UserB 를 팔로우하였으며, 아직 승인되지 않았다 / 승인되었다`
-    APPROVED = 'A'
-    UNAPPROVED = 'U'
-    REJECTED = 'R'
-    CHOICES_TYPE = (
-        (APPROVED, 'approved'),
-        (UNAPPROVED, 'unapproved'),
-        (REJECTED, 'rejected'),
+    CHOICES_TYPE = Choices(
+        'APPROVED',
+        'UNAPPROVED',
+        'REJECTED'
     )
 
     # 같은 모델에 대해 ForeignKey 를 두 개 쓰고 있어서
@@ -128,7 +181,7 @@ class FollowRelation(TimestampedModel):
     # 승인됨/승인되지 않음을 표현하는 DB 상 필드
     is_approved = models.CharField(
         max_length=1,
-        default=UNAPPROVED,
+        default='UNAPPROVED',
         choices=CHOICES_TYPE,
         related_name='is_approved'
     )
@@ -139,4 +192,4 @@ class FollowRelation(TimestampedModel):
     class Meta:
         db_table = 'follow_relation'
         verbose_name = 'Follow Relation'
-        verbose_name_plural = '{} {}'.format(verbose_name, '목록')
+        verbose_name_plural = f'{verbose_name} 목록'
